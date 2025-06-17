@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "debug 3rapp",
+            "request": "launch",
+            "runtimeArgs": ["run-script", "debug"],
+            "autoAttachChildProcesses": true,
+            "console": "integratedTerminal",
+            "runtimeExecutable": "pnpm",
+            "skipFiles": ["<node_internals>/**"],
+            "type": "node"
+        }
+    ]
+}

@@ -1,0 +1,3 @@
+.layout {
+    @apply tw-flex tw-flex-auto tw-flex-wrap tw-items-center tw-justify-center tw-bg-[url(../styles/images/bg-light.png)];
+}

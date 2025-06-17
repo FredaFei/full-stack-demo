@@ -1,0 +1,65 @@
+{
+    // 全局包管理器
+    "npm.packageManager": "pnpm",
+
+    // 文件识别
+    "files.associations": {
+        "*.md": "markdown",
+        "*.mdx": "mdx"
+    },
+
+    // 保存时自动格式化
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+
+    // TS和React
+    "typescript.suggest.enabled": true,
+    "javascript.suggest.enabled": true,
+    "javascript.preferences.importModuleSpecifier": "project-relative",
+    "typescript.validate.enable": true,
+    "typescript.suggest.jsdoc.generateReturns": false,
+    "[javascript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    },
+
+    // 静态文件格式化
+    "[yaml]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[jsonc]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[markdown]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "yaml.maxItemsComputed": 50000,
+
+    // Copilot提示与vscode代码提示的冲突解决
+    // 确保默认补全提供程序都启用
+    "editor.inlineSuggest.enabled": true, // 启用内联建议(Copilot)
+    "editor.suggestSelection": "first", // 默认选择第一个建议
+    "editor.quickSuggestions": {
+        // 启用快速建议
+        "other": true,
+        "comments": false,
+        "strings": true
+    },
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false
+    }
+}
