@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:latest
+    container_name: redis-container
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - network1  # 连接到已存在的网络
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres-container
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: nhblog
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345678
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - network1  # 连接到已存在的网络
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 5
+
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nextjs-app
+    ports:
+      - "3000:3000"
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DATABASE_URL: postgres://postgres:12345678@postgres:5432/nhblog
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - network1  # 连接到已存在的网络
+
+networks:
+  network1:  # 声明使用外部网络
+    external: true  # 标记为已存在的网络
+
+volumes:
+  redis_data:
+  postgres_data:
+
+
+
+# dockerfile 文件内容如下:
+# 基础镜像
+FROM node:18-alpine
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制依赖文件
+COPY package.json package-lock.json ./
+
+# 安装依赖
+RUN npm ci
+
+# 复制项目文件
+COPY . .
+
+# 构建 Next.js 应用
+RUN npm run build
+
+# 暴露端口
+EXPOSE 3000
+
+# 启动应用
+CMD ["npm", "start"]
+
+# 启动服务
+docker-compose up -d
+# 检查服务状态
+docker-compose ps
+# 访问应用
+# 在浏览器中打开 http://localhost:3000，Next.js 应用将连接到 Redis 和 Postgres 服务。
+
+# 通过这种方式，你可以轻松地在本地或生产环境中部署完整的 Next.js 应用栈，同时保持开发和部署环境的一致性
+
+# 在 Docker Compose 中正确处理环境变量传递需要在 docker-compose.yml 中显式引用环境变量，并确保 .env 文件位于正确位置
