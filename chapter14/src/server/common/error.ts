@@ -12,7 +12,8 @@ export const createErrorResult = (title: string, error?: any, code?: number) => 
     let message = title;
     if (!isNil(error)) {
         message =
-            error instanceof Error || 'message' in error
+            error instanceof Error ||
+            (typeof error === 'object' && error !== null && 'message' in error)
                 ? `${title}:${error.message}`
                 : `${title}:${error.toString()}`;
     }

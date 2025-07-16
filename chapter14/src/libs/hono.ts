@@ -51,8 +51,9 @@ export const fetchApi = async <
             redirect('/auth/login');
         } else {
             await deleteCookie(ACCESS_TOKEN_COOKIE_NAME);
-            window.location.href = '/auth/login';
-            return new Promise(() => {}); // 防止后续代码执行
+            return result;
+            // window.location.href = '/auth/login';
+            // return new Promise(() => {}); // 防止后续代码执行
         }
     }
     return result;

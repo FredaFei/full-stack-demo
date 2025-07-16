@@ -103,7 +103,10 @@ export const useAuthLoginSubmitHandler = (setAuthError: (error: string | null) =
             try {
                 const res = await authApi.login(data);
                 status = res.status;
-                if (!res.ok) throw new Error((await res.json()).message);
+                if (!res.ok) {
+                    const resJson = await res.json();
+                    throw new Error(resJson.message);
+                }
                 const result = await res.json();
                 if (!isNil(result.token)) {
                     setAccessToken(result.token);
