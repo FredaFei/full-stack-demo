@@ -4,7 +4,7 @@ import { extendZodWithOpenApi } from 'zod-openapi';
 
 import { authSchema } from '../auth/schema';
 import { categoryListSchema, categorySchema } from '../category/schema';
-import { tagListSchema } from '../tag/schema';
+import { tagsSchema } from '../tag/schema';
 
 extendZodWithOpenApi(z);
 
@@ -28,7 +28,7 @@ export const postSchema = z
         createdAt: z.string().openapi({ description: '文章创建时间' }),
         updatedAt: z.string().openapi({ description: '最近更新时间' }),
         author: authSchema.openapi({ description: '文章作者' }),
-        tags: tagListSchema.openapi({ description: '关联标签列表' }),
+        tags: tagsSchema.openapi({ description: '关联标签列表' }),
         categories: categoryListSchema.openapi({ description: '关联分类及其祖先分类列表' }),
         category: categorySchema.nullable().openapi({ description: '关联分类' }),
     })
@@ -141,7 +141,7 @@ export const getPostItemRequestSchema = (
                 .nullable()
                 .optional()
                 .openapi({ description: '文章摘要' }),
-            tags: tagListSchema.optional().openapi({ description: '关联标签列表' }),
+            tags: tagsSchema.optional().openapi({ description: '关联标签列表' }),
             categoryId: z.string().optional().openapi({ description: '关联分类ID' }),
             keywords: z
                 .string()
