@@ -7,7 +7,7 @@ import { getTime, localTime } from '@/libs/time';
 import jwt from 'jsonwebtoken';
 import { isNil } from 'lodash';
 
-import type { AuthItem, AuthLoginResponse } from './type';
+import type { AuthItem, AuthlocalLoginResult } from './type';
 
 import { createErrorResult } from '../common/error';
 import { passport } from './passport';
@@ -30,12 +30,12 @@ export const addTokenToBlacklist = async (token: string): Promise<boolean> => {
         // 计算剩余时间（秒）
         const timeToExpire = payload.exp - localTime(getTime()).unix();
         if (timeToExpire <= 0) return false; // token已过期，无需加入黑名单
-
         // 验证token的有效性（签名验证）
         jwt.verify(token, authConfig.jwtSecret);
 
         // token有效且未过期，加入黑名单
         await redis.set(`${BLACKLIST_KEY}:${token}`, '1', 'EX', timeToExpire);
+
         return true;
     } catch (error) {
         // token已过期或无效，无需加入黑名单
@@ -79,17 +79,22 @@ export const verifyJWT = async (c: Context) =>
             }
             // 将用户信息添加到请求中，供后续api处理器使用
             (c.req as any).user = user;
+            (c.req as any).token = token;
             resolve(true);
         })(c.req.raw, (c.res as any).raw);
     });
 
 export const authLogin = async (req: any, res: any) => {
-    return new Promise<AuthLoginResponse>((resolve) => {
+    return new Promise<AuthlocalLoginResult>((resolve) => {
         passport.authenticate('local', (err: any, user: AuthItem, _info: any) => {
             if (err) {
-                return err.code === 401
-                    ? resolve(createErrorResult('认证失败', err.message, 401) as any)
-                    : resolve(createErrorResult('服务器错误', err, 500) as any);
+                if (err.code === 401) {
+                    const { message } = createErrorResult('认证失败', err.message);
+                    resolve({ code: 401, message, businessCode: 'INVALID_CREDENTIALS' });
+                } else {
+                    const { message } = createErrorResult('服务器错误', err);
+                    resolve({ code: 500, message, businessCode: 'SERVER_ERROR' });
+                }
             }
             const token = generateAccessToken(user);
             return resolve({ token, code: 200 });

@@ -20,8 +20,8 @@ export const checkAuth = async () =>
     checkAccessToken(async () => {
         const res = await authApi.profile();
         if (!res.ok) return null;
-        const { result, data } = await res.json();
-        if (!result || isNil(data)) return null;
+        const { data } = await res.json();
+        if (isNil(data)) return null;
         return data;
     });
 

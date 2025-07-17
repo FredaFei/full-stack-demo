@@ -13,7 +13,8 @@ import {
     createUnauthorizedErrorResponse,
     createValidatorErrorResponse,
 } from '../common/response';
-import { authLoginRequestBodySchema, logoutSchema, profileSchema, tokenSchema } from './schema';
+import { buildErrorResponse, buildSuccessResponse } from '../common/responseBuilder';
+import { authLoginRequestBodySchema, logoutResponseSchema, profileResponseSchema, tokenResponseSchema } from './schema';
 import { getUser } from './service';
 import { addTokenToBlacklist, authLogin, verifyJWT } from './utils';
 
@@ -33,20 +34,22 @@ export const authRoutes = app
             summary: '获取用户信息',
             description: '无论是否登录，都会返回状态码 200，如果未登录则用户信息返回null',
             responses: {
-                ...createSuccessResponse(profileSchema),
+                // 创建可为空的成功响应
+                ...createSuccessResponse(profileResponseSchema.nullable()),
                 ...createServerErrorResponse(),
             },
         }),
         async (c) => {
             try {
                 const isAuthenticated = await verifyJWT(c);
-                if (!isAuthenticated) return c.json({ result: false, data: null }, 200);
+                if (!isAuthenticated) return c.json(buildSuccessResponse(null), 200);
                 const { id } = (c.req as any).user as AuthItem;
                 const user = await getUser(id);
-                if (isNil(user)) return c.json({ result: false, data: null }, 200);
-                return c.json({ result: true, data: user }, 200);
+                if (isNil(user)) return c.json(buildSuccessResponse(null), 200);
+                return c.json(buildSuccessResponse(user), 200);
             } catch (error) {
-                return c.json(createErrorResult('获取用户失败', error), 500);
+                const info = createErrorResult('获取用户失败', error, 'INVALID_USER');
+                return c.json(buildErrorResponse(info), 500);
             }
         },
     )
@@ -58,7 +61,7 @@ export const authRoutes = app
             description: '用户登录',
             responses: {
                 ...createValidatorErrorResponse(),
-                ...createSuccessResponse(tokenSchema),
+                ...createSuccessResponse(tokenResponseSchema),
                 ...createUnauthorizedErrorResponse('认证失败'),
                 ...createServerErrorResponse(),
             },
@@ -72,11 +75,15 @@ export const authRoutes = app
                 body,
             };
             const result = await authLogin(authReq, (c.res as any).raw);
+            console.log('result.code', result, result.code);
             switch (result.code) {
                 case 200:
-                    return c.json({ token: result.token }, 200);
+                    return c.json(buildSuccessResponse({ token: result.token }), 200);
                 default:
-                    return c.json(result, result.code);
+                    return c.json(
+                        buildErrorResponse({ message: result.message, code: result.businessCode }),
+                        result.code,
+                    );
             }
         },
     )
@@ -88,20 +95,24 @@ export const authRoutes = app
             description: '用户登出',
             responses: {
                 ...createUnauthorizedErrorResponse(),
-                ...createSuccessResponse(logoutSchema),
+                ...createSuccessResponse(logoutResponseSchema),
                 ...createServerErrorResponse(),
             },
         }),
         AuthProtected,
         async (c) => {
             try {
-                const { id } = (c.req as any).user as AuthItem;
-                const success = await addTokenToBlacklist(id);
+                const token = (c.req as any).token;
+                const success = await addTokenToBlacklist(token);
                 // 注意：这里直接返回200就行了。因为反正你是退出成功还是token失效，前端都是跳转到登录页，没有什么区别
-                if (!success) return c.json(createErrorResult('用户未登录'), 200);
-                return c.json({ message: '登出成功' }, 200);
+                if (!success)
+                    return c.json(buildErrorResponse(createErrorResult('用户未登录')), 200);
+                return c.json(buildSuccessResponse({ message: '登出成功' }), 200);
             } catch (error) {
-                return c.json(createErrorResult('登出失败', error), 500);
+                return c.json(
+                    buildErrorResponse(createErrorResult('登出失败', error, 'SERVER_ERROR')),
+                    500,
+                );
             }
         },
     );

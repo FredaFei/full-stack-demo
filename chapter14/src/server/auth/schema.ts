@@ -14,9 +14,11 @@ export const authLoginRequestBodySchema = z.object({
 /**
  * 登录响应数据结构
  */
-export const tokenSchema = z
+export const tokenResponseSchema = z
     .object({
-        token: z.string().openapi({ ref: 'Token', description: 'jwt token' }),
+        data: z.object({
+            token: z.string().openapi({ ref: 'Token', description: 'jwt token' }),
+        }),
     })
     .openapi({ ref: 'AuthToken', description: '用户登录/获取token响应数据' });
 
@@ -36,9 +38,8 @@ export const authSchema = z
 /**
  * 获取用户信息响应数据结构
  */
-export const profileSchema = z
+export const profileResponseSchema = z
     .object({
-        result: z.boolean().openapi({ description: '获取用户信息是否成功' }),
         data: authSchema.or(z.null()).openapi({ description: '用户信息' }),
     })
     .openapi({
@@ -49,8 +50,10 @@ export const profileSchema = z
 /**
  * 登出响应数据结构
  */
-export const logoutSchema = z
+export const logoutResponseSchema = z
     .object({
-        message: z.string(),
+        data: z.object({
+            message: z.string(),
+        }),
     })
     .openapi({ ref: 'AuthLogout', description: '登出响应数据' });

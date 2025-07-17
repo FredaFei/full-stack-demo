@@ -11,13 +11,17 @@ export const AuthProtected = createMiddleware(async (c, next) => {
         const isAuthenticated = await verifyJWT(c);
         if (!isAuthenticated) {
             throw new HTTPException(401, {
-                res: new Response(JSON.stringify(createErrorResult('用户未认证'))),
+                res: new Response(
+                    JSON.stringify(createErrorResult('用户未认证', 'AUTHENTICATION_REQUIRED ')),
+                ),
             });
         }
         await next();
     } catch (error) {
         throw new HTTPException(500, {
-            res: new Response(JSON.stringify(createErrorResult(error as any))),
+            res: new Response(
+                JSON.stringify(createErrorResult('认证失败', error, 'INVALID_TOKEN')),
+            ),
         });
     }
 });

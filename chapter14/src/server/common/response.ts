@@ -2,7 +2,7 @@ import type { ZodSchema } from 'zod';
 
 import { resolver } from 'hono-openapi/zod';
 
-import { errorSchema } from './schema';
+import { errorResponseSchema } from './schema';
 
 /**
  * 创建OpenAPI响应信息
@@ -30,9 +30,10 @@ export const createResponse = <T extends ZodSchema, S extends number>(
 export const createSuccessResponse = <T extends ZodSchema>(schema: T, description?: string) => {
     return createResponse(schema, 200, description ?? '请求成功');
 };
+
 /**
  * 创建OpenAPI 201 成功响应信息
- * @param description
+ * @param descriptioncreateSuccessResponse可以内部
  * @param schema
  */
 export const create201SuccessResponse = <T extends ZodSchema>(schema: T, description?: string) => {
@@ -47,7 +48,7 @@ export const createErrorResponse = <S extends number>(description: string, statu
     return {
         [status]: {
             description,
-            content: { 'application/json': { schema: resolver(errorSchema) } },
+            content: { 'application/json': { schema: resolver(errorResponseSchema) } },
         },
     };
 };
@@ -57,7 +58,7 @@ export const createErrorResponse = <S extends number>(description: string, statu
  * @param description
  */
 export const createValidatorErrorResponse = (description?: string) => {
-    return createErrorResponse(description ?? '请求数据验证失败', 400);
+    return createErrorResponse(description ?? '请求数据验证失败', 422);
 };
 
 /**

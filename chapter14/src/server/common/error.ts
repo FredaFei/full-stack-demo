@@ -8,7 +8,11 @@ import { isNil } from 'lodash';
  * @param error
  * @param code
  */
-export const createErrorResult = (title: string, error?: any, code?: number) => {
+export const createErrorResult = (
+    title: string,
+    error?: any,
+    code?: string,
+): { code: string; message: string } => {
     let message = title;
     if (!isNil(error)) {
         message =
@@ -19,7 +23,7 @@ export const createErrorResult = (title: string, error?: any, code?: number) => 
     }
 
     return {
-        code,
+        code: code ?? '',
         message,
     };
 };

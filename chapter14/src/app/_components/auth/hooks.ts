@@ -105,11 +105,14 @@ export const useAuthLoginSubmitHandler = (setAuthError: (error: string | null) =
                 status = res.status;
                 if (!res.ok) {
                     const resJson = await res.json();
-                    throw new Error(resJson.message);
+                    const errorMessage = resJson.errors?.[0]?.message || '登录失败';
+                    throw new Error(errorMessage);
                 }
                 const result = await res.json();
-                if (!isNil(result.token)) {
-                    setAccessToken(result.token);
+                console.log('authApi.login 3', result);
+                const token = result.data?.token;
+                if (!isNil(token)) {
+                    setAccessToken(token);
                     const auth = await checkAuth();
                     if (!isNil(auth)) {
                         setAuth(auth);
@@ -121,6 +124,7 @@ export const useAuthLoginSubmitHandler = (setAuthError: (error: string | null) =
                     setChecked(false);
                 }
             } catch (error) {
+                console.error('authApi.login error', error);
                 if (status === 401) {
                     setAuthError((error as Error).message);
                 }
