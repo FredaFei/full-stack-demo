@@ -53,6 +53,7 @@ export default antfu(
             'react/no-leaked-conditional-rendering': 'off',
             'react/no-forward-ref': 'off',
             'jsdoc/check-param-names': 'off',
+            'comma-dangle': 'never',
         },
     },
     ...tailwind.configs['flat/recommended'],
