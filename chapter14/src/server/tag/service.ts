@@ -3,11 +3,11 @@
 import db from '@/libs/db/client';
 /**
  * 查询标签信息
- * @param item
+ * @param id
  */
-export const queryTagItem = async (item: string) => {
+export const queryTagItem = async (id: string) => {
     return await db.tag.findFirst({
-        where: { OR: [{ text: decodeURIComponent(item) }, { id: item }] },
+        where: { OR: [{ text: decodeURIComponent(id) }, { id }] },
     });
 };
 

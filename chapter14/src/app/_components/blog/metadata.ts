@@ -38,7 +38,7 @@ export const getBlogMetadata = async ({
         const result = await tagApi.detail(tag);
         if (result.ok) {
             const data = await result.json();
-            if (!isNil(data)) title = `${title}${data.text} | `;
+            if (!isNil(data.data)) title = `${title}${data.data.text} | `;
             keywords.push(tag);
         }
     }

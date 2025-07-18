@@ -25,8 +25,8 @@ export const buildSuccessResponse = <T>(
     meta?: BaseMetaInput,
 ): z.infer<ReturnType<typeof successResponseSchema<z.ZodType<T>>>> => {
     const defaultMeta: z.infer<typeof baseMetaSchema> = {
-        timestamp: Date.now(),
-        ...meta,
+        timestamp: meta?.timestamp || Date.now(),
+        ...(meta??{}),
     };
 
     return {
@@ -46,8 +46,8 @@ export const buildErrorResponse = (
     meta?: BaseMetaInput,
 ): z.infer<typeof errorResponseSchema> => {
     const defaultMeta: z.infer<typeof baseMetaSchema> = {
-        timestamp: Date.now(),
-        ...meta,
+        timestamp: meta?.timestamp || Date.now(),
+        ...(meta??{}),
     };
 
     return {
@@ -69,8 +69,8 @@ export const buildPaginatedResponse = <T>(
     meta?: BaseMetaInput,
 ): z.infer<ReturnType<typeof paginatedResponseSchema<z.ZodType<T>>>> => {
     const defaultMeta = {
-        timestamp: Date.now(),
-        ...meta,
+         timestamp: meta?.timestamp || Date.now(),
+        ...(meta??{}),
         ...pagination,
     };
 

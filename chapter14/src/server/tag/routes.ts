@@ -10,8 +10,9 @@ import {
     createSuccessResponse,
     createValidatorErrorResponse,
 } from '../common/response';
-import { tagItemRequestParamsSchema, tagsSchema, tagSchema } from './schema';
+import { tagItemRequestParamsSchema, tagDetailResponseSchema, tagsResponseSchema } from './schema';
 import { queryTagItem, queryTagList } from './service';
+import { buildErrorResponse, buildSuccessResponse } from '../common/responseBuilder';
 
 const app = createHonoApp();
 
@@ -23,13 +24,13 @@ export type TagApiType = typeof tagRoutes;
 
 export const tagRoutes = app
     .get(
-        '/:item',
+        '/:id',
         describeRoute({
             tags: tagTags,
             summary: '标签详情查询',
             description: '查询单个标签的详细信息',
             responses: {
-                ...createSuccessResponse(tagSchema),
+                ...createSuccessResponse(tagDetailResponseSchema),
                 ...createValidatorErrorResponse(),
                 ...createNotFoundErrorResponse('标签不存在'),
                 ...createServerErrorResponse('查询标签数据数据失败'),
@@ -38,12 +39,12 @@ export const tagRoutes = app
         validator('param', tagItemRequestParamsSchema, defaultValidatorErrorHandler),
         async (c) => {
             try {
-                const { item } = c.req.valid('param');
-                const result = await queryTagItem(item);
-                if (!isNil(result)) return c.json(result, 200);
-                return c.json(createErrorResult('标签不存在'), 404);
+                const { id } = c.req.valid('param');
+                const result = await queryTagItem(id);
+                if (!isNil(result)) return c.json(buildSuccessResponse(result), 200);
+                return c.json(buildErrorResponse(createErrorResult('标签不存在')), 404);
             } catch (error) {
-                return c.json(createErrorResult('查询标签数据失败', error), 500);
+                return c.json(buildErrorResponse(createErrorResult('查询标签数据失败', error,'SERVER_ERROR')), 500);
             }
         },
     )
@@ -54,7 +55,7 @@ export const tagRoutes = app
             summary: '标签列表查询',
             description: '标签列表查询',
             responses: {
-                ...createSuccessResponse(tagsSchema),
+                ...createSuccessResponse(tagsResponseSchema),
                 ...createValidatorErrorResponse(),
                 ...createServerErrorResponse('查询标签列表数据失败'),
             },
@@ -62,9 +63,9 @@ export const tagRoutes = app
         async (c) => {
             try {
                 const result = await queryTagList();
-                return c.json(result, 200);
+                return c.json(buildSuccessResponse(result), 200);
             } catch (error) {
-                return c.json(createErrorResult('查询标签列表数据失败', error), 500);
+                return c.json(buildErrorResponse(createErrorResult('查询标签列表数据失败', error, 'SERVER_ERROR')), 500);
             }
         },
     );

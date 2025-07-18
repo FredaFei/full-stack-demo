@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from 'zod-openapi';
-import { baseMetaSchema, paginationMetaSchema } from '../common/schema';
+
+import { baseMetaSchema, successResponseSchema } from '../common/schema';
 
 extendZodWithOpenApi(z);
 
@@ -8,37 +9,30 @@ extendZodWithOpenApi(z);
  * 文章详情查询请求数据结构
  */
 export const tagItemRequestParamsSchema = z.object({
-    item: z.string().openapi({ description: '标签ID' }),
+    id: z.string().openapi({ description: '标签ID' }),
 });
 
 /**
  * 单个标签数据结构
  */
-export const tagSchema = z.object({
-  id: z.string().openapi({ description: '标签ID' }),
-  name: z.string().openapi({ description: '标签名称' }),
-}).openapi({ ref: 'Tag', description: '单个标签信息' });
+export const tagSchema = z
+    .object({
+        id: z.string().openapi({ description: '标签ID' }),
+        text: z.string().openapi({ description: '标签名称' }),
+    })
+    .openapi({ ref: 'Tag', description: '单个标签信息' });
 
 /**
  * 标签列表查询响应数据结构
  */
-export const tagsSchema = z
-    .array(tagSchema)
-    .openapi({ ref: 'Tags', description: '标签列表数据' });
+export const tagsSchema = z.array(tagSchema).openapi({ ref: 'Tags', description: '标签列表数据' });
 
 /**
  * 标签列表查询响应数据结构
  */
-export const tagsResponseSchema = z
-  .object({
-    data: tagsSchema.openapi({ description: '标签列表数据' }),
-    meta: baseMetaSchema.merge(paginationMetaSchema).openapi({ description: '标签数量' }),
-  })
-  .openapi({ ref: 'TagsResponse', description: '获取标签列表的响应' });
+export const tagsResponseSchema = successResponseSchema(z.array(tagSchema)).openapi({ ref: 'TagsResponse', description: '获取标签列表的响应' });
 
 /**
  * 标签查询响应数据结构
  */
-export const tagDetailResponseSchema = z
-    .object({ data: tagSchema })
-    .openapi({ ref: 'TagDetail', description: '标签详情数据' });
+export const tagDetailResponseSchema = successResponseSchema(tagSchema).openapi({ ref: 'TagDetail', description: '标签详情数据' });

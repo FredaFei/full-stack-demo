@@ -9,8 +9,8 @@ import { TagListComponent } from './list';
 
 export const TagListWidget: FC<{ actived?: string }> = async ({ actived }) => {
     const result = await tagApi.list();
-    if (!result.ok) throw new Error((await result.json()).message);
-    const tags = await result.json();
+    if (!result.ok) throw new Error((await result.json()).errors[0].message);
+    const {data: tags} = await result.json();
     let activeId;
     if (!isNil(actived)) {
         const activeItem = tags.find(

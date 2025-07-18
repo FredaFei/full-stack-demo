@@ -2,7 +2,8 @@
 'use client';
 
 import type { CategoryItem } from '@/server/category/type';
-import type { TagItem } from '@/server/tag/type';
+import type { TagItem, TagList, TagListResponse } from '@/server/tag/type';
+import type { ErrorResponse } from '@/server/common/type';
 import type { ChangeEventHandler, MouseEventHandler } from 'react';
 
 import { categoryApi } from '@/api/category';
@@ -121,22 +122,22 @@ export const PostActionForm = forwardRef<PostActionFormRef, PostActionFormProps>
     /**
      * 文章标签
      */
-    const [allTags, setAllTags] = useState<TagItem[]>([]);
+    const [allTags, setAllTags] = useState<TagList>([]);
     const [activeTagIndex, setActiveTagIndex] = useState<number | null>(null);
-    const [tags, setTags] = useState<TagItem[]>(props.type === 'create' ? [] : props.item.tags);
+    const [tags, setTags] = useState<TagList>(props.type === 'create' ? [] : props.item.tags);
 
     useEffect(() => {
         (async () => {
             const result = await tagApi.list();
+            const data = await result.json()
             if (!result.ok) {
                 toast({
                     variant: 'destructive',
                     title: '读取标签列表失败,请刷新',
-                    description: (await result.json()).message,
+                    description: (data as ErrorResponse).errors[0].message,
                 });
             } else {
-                const data = await result.json();
-                setAllTags(data);
+                setAllTags((data as TagListResponse).data);
             }
         })();
     }, []);

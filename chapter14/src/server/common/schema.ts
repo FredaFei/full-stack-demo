@@ -32,27 +32,20 @@ export const paginationMetaSchema = z
 
 // 分页响应Schema
 export const paginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
-    z
-        .object({
-            data: z.array(itemSchema).openapi({ description: '数据列表' }),
-            meta: baseMetaSchema.merge(paginationMetaSchema).openapi({ description: '分页信息和元数据' }),
-        })
-        .strict();
+    z.object({
+        data: z.array(itemSchema).openapi({ description: '数据列表' }),
+        meta: baseMetaSchema.merge(paginationMetaSchema).openapi({ description: '分页信息和元数据' }),
+    })
+    .strict();
 
 // 成功响应Schema
-export const successResponseSchema = <
-    T extends z.ZodTypeAny,
-    M extends z.ZodTypeAny = typeof baseMetaSchema,
->(
-    dataSchema: T,
-    metaSchema?: M,
-) =>
-    z
-        .object({
-            data: dataSchema,
-            meta: (metaSchema || baseMetaSchema).optional(),
-        })
-        .strict();
+export const successResponseSchema = <T extends z.ZodTypeAny, M extends z.ZodTypeAny = typeof baseMetaSchema,>(dataSchema: T, metaSchema?: M,) =>
+    z.object({
+        data: dataSchema,
+        meta: (metaSchema || baseMetaSchema).optional(),
+    })
+    .strict();
+
 // 错误信息Schema
 export const errorItemSchema = z
     .object({
