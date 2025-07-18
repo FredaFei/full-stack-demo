@@ -16,7 +16,7 @@ export type TagList = z.infer<typeof tagsSchema>;
 
 /**
  * 请求标签列表的响应数据类型（与API文档一致）
- * 包含分页信息和元数据
+ * todo 包含分页信息和元数据
  * */ 
 export type TagListResponse = z.infer<typeof tagsResponseSchema>;
 

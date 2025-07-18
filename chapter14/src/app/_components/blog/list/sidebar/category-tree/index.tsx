@@ -9,8 +9,8 @@ import { CategoryTreeComponent } from './tree';
 
 export const CategoryTreeWidget: FC<{ actives?: false | CategoryItem[] }> = async ({ actives }) => {
     const result = await categoryApi.tree();
-    if (!result.ok) throw new Error((await result.json()).message);
-    const categories = await result.json();
+    if (!result.ok) throw new Error((await result.json()).errors[0].message);
+    const { data: categories } = await result.json();
     const activeIds = (actives || []).map((item) => item.id);
     return (
         <SidebarWidget

@@ -110,10 +110,10 @@ export const PostActionForm = forwardRef<PostActionFormRef, PostActionFormProps>
                 toast({
                     variant: 'destructive',
                     title: '读取分类列表失败,请刷新',
-                    description: (await result.json()).message,
+                    description: (await result.json()).errors[0].message,
                 });
             } else {
-                const data = await result.json();
+                const { data } = await result.json();
                 setAllCategories(data);
             }
         })();

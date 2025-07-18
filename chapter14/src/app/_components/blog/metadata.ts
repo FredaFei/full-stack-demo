@@ -28,7 +28,7 @@ export const getBlogMetadata = async ({
     if (!isNil(categories) && categories.length > 0) {
         const result = await categoryApi.breadcrumb(categories[categories.length - 1]);
         if (!result.ok) return {};
-        const data = await result.json();
+        const { data } = await result.json();
         if (data.length > 0) {
             title = `${data[data.length - 1].name} | `;
             keywords = [...keywords, ...data.map((i) => i.name)];

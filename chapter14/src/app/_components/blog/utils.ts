@@ -9,8 +9,8 @@ export const getCategories = async (categories?: string[]): Promise<CategoryItem
     if (!isNil(categories) && categories.length > 0) {
         const latest = categories[categories.length - 1];
         const result = await categoryApi.breadcrumb(latest);
-        if (!result.ok) throw new Error((await result.json()).message);
-        const items = await result.json();
+        if (!result.ok) throw new Error((await result.json()).errors[0].message);
+        const { data: items } = await result.json();
         if (items.length !== categories.length) return false;
         if (
             !items.every(

@@ -11,10 +11,11 @@ import {
 import {
     categoryBreadcrumbRequestParamsSchema,
     categoryListRequestParamsSchema,
-    categoryListSchema,
-    categoryTreeSchema,
+    categoryListResponseSchema,
+    categoryTreeResponseSchema,
 } from './schema';
 import { queryCategoryBreadcrumb, queryCategoryList, queryCategoryTree } from './service';
+import { buildErrorResponse, buildSuccessResponse } from '../common/responseBuilder';
 
 const app = createHonoApp();
 
@@ -32,7 +33,7 @@ export const categoryRoutes = app
             summary: '分类列表查询',
             description: '查询出分类树,并进行扁平化处理后的一维列表',
             responses: {
-                ...createSuccessResponse(categoryListSchema),
+                ...createSuccessResponse(categoryListResponseSchema),
                 ...createValidatorErrorResponse(),
                 ...createServerErrorResponse('查询分类列表数据失败'),
             },
@@ -43,9 +44,9 @@ export const categoryRoutes = app
                 const { parent } = c.req.valid('param');
                 const result = await queryCategoryList(parent);
 
-                return c.json(result, 200);
+                return c.json(buildSuccessResponse(result), 200);
             } catch (error) {
-                return c.json(createErrorResult('查询分类树数据失败', error), 500);
+                return c.json(buildErrorResponse(createErrorResult('查询分类树数据失败', error, 'SERVER_ERROR')), 500);
             }
         },
     )
@@ -56,7 +57,7 @@ export const categoryRoutes = app
             summary: '分类树查询',
             description: '树形嵌套结构的分类数据查询',
             responses: {
-                ...createSuccessResponse(categoryTreeSchema),
+                ...createSuccessResponse(categoryTreeResponseSchema),
                 ...createValidatorErrorResponse(),
                 ...createServerErrorResponse('查询分类树数据失败'),
             },
@@ -66,9 +67,9 @@ export const categoryRoutes = app
             try {
                 const { parent } = c.req.valid('param');
                 const result = await queryCategoryTree(parent);
-                return c.json(result, 200);
+                return c.json(buildSuccessResponse(result), 200);
             } catch (error) {
-                return c.json(createErrorResult('查询分类列表(扁平树)数据失败', error), 500);
+                return c.json(buildErrorResponse(createErrorResult('查询分类列表(扁平树)数据失败', error, 'SERVER_ERROR')), 500);
             }
         },
     )
@@ -79,7 +80,7 @@ export const categoryRoutes = app
             summary: '分类面包屑查询',
             description: '通过一个父分类,查询出其祖先分类并组成一个一维分类列表',
             responses: {
-                ...createSuccessResponse(categoryListSchema),
+                ...createSuccessResponse(categoryListResponseSchema),
                 ...createValidatorErrorResponse(),
                 ...createServerErrorResponse('查询分类面包屑数据失败'),
             },
@@ -89,9 +90,9 @@ export const categoryRoutes = app
             try {
                 const { latest } = c.req.valid('param');
                 const result = await queryCategoryBreadcrumb(latest);
-                return c.json(result, 200);
+                return c.json(buildSuccessResponse(result), 200);
             } catch (error) {
-                return c.json(createErrorResult('查询分类面包屑数据失败', error), 500);
+                return c.json(buildErrorResponse(createErrorResult('查询分类面包屑数据失败', error, 'SERVER_ERROR')), 500);
             }
         },
     );

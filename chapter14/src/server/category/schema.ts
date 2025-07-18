@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from 'zod-openapi';
+import { successResponseSchema } from '../common/schema';
 
 extendZodWithOpenApi(z);
 
@@ -51,13 +52,20 @@ export const categorySchema: z.ZodType<Category> = baseCategorySchema
 /**
  * 分类列表查询响应数据结构
  */
-export const categoryListSchema = z
-    .array(baseCategorySchema)
-    .openapi({ ref: 'CategoryList', description: '分类列表数据' });
+export const categoryListSchema = z.array(baseCategorySchema).openapi({ description: '分类列表数据' });
 
 /**
  * 分类树查询响应数据结构
  */
-export const categoryTreeSchema = z
-    .array(categorySchema)
-    .openapi({ ref: 'CategoryTree', description: '分类树数据' });
+export const categoryTreeSchema = z.array(categorySchema).openapi({ description: '分类树数据' });
+
+/**
+ * 分类列表查询响应的数据结构
+ */
+export const categoryListResponseSchema = successResponseSchema(categoryListSchema).openapi({ ref: 'CategoryList', description: '分类列表数据' });
+
+/**
+ * 分类树查询响应的数据结构
+ */
+export const categoryTreeResponseSchema = successResponseSchema(categoryTreeSchema).openapi({ ref: 'CategoryTree', description: '分类树数据' });
+
